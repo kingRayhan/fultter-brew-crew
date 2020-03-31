@@ -1,20 +1,20 @@
 import 'package:brew_crew/mixins/ValidatorMixin.dart';
 import 'package:brew_crew/models/User.dart';
-import 'package:brew_crew/screens/authentiation/Signup.dart';
+import 'package:brew_crew/Helper.dart';
+import 'package:brew_crew/screens/authentiation/Signin.dart';
 import 'package:brew_crew/services/AuthService.dart';
 import 'package:brew_crew/widgets/LoaderWidget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:brew_crew/Helper.dart';
 
-class Signin extends StatefulWidget {
-  Signin({Key key}) : super(key: key);
+class Signup extends StatefulWidget {
+  Signup({Key key}) : super(key: key);
 
   @override
-  _SigninState createState() => _SigninState();
+  _SignupState createState() => _SignupState();
 }
 
-class _SigninState extends State<Signin> {
+class _SignupState extends State<Signup> {
   final AuthService _auth = new AuthService();
   final _formKey = new GlobalKey<FormState>();
   final _validatorMixin = new ValidatorMixin();
@@ -32,14 +32,14 @@ class _SigninState extends State<Signin> {
         : Scaffold(
             appBar: AppBar(
               elevation: 0,
-              title: Text("Sign In"),
+              title: Text("Sign up"),
               actions: <Widget>[
                 FlatButton(
                   onPressed: () {
-                    Helper.changeRoute(context: context, navigateTo: Signup());
+                    Helper.changeRoute(context: context, navigateTo: Signin());
                   },
                   child: Text(
-                    "Sign up",
+                    "Sign in",
                     style: TextStyle(color: Colors.white),
                   ),
                 )
@@ -88,33 +88,29 @@ class _SigninState extends State<Signin> {
   Widget _submitButton(BuildContext context) {
     return Align(
       alignment: Alignment.centerLeft,
-      child: Row(
-        children: <Widget>[
-          RaisedButton.icon(
-            onPressed: () {
-              if (_formKey.currentState.validate()) {
-                _formKey.currentState.save();
-                print(credential.toString());
-              }
-            },
-            icon: Icon(Icons.lock_open),
-            label: Text("Sign in"),
-            color: Theme.of(context).primaryColorDark,
-            textColor: Colors.white,
-          ),
-          SizedBox(width: 15),
-          RaisedButton.icon(
-            onPressed: () async {
-              setState(() => loading = true);
-              await _auth.signInAnnonymously();
+      child: RaisedButton.icon(
+        onPressed: () async {
+          if (_formKey.currentState.validate()) {
+            setState(() => loading = true);
+            _formKey.currentState.save();
+
+            User user = await _auth.register(
+              credential['email'],
+              credential['password'],
+            );
+
+            if (user == null) {
               setState(() => loading = false);
-            },
-            icon: Icon(Icons.lock_open),
-            label: Text("Sign in annonymously"),
-            color: Colors.pinkAccent[400],
-            textColor: Colors.white,
-          ),
-        ],
+              print("invalid");
+            } else {
+              setState(() => loading = false);
+            }
+          }
+        },
+        icon: Icon(Icons.lock_open),
+        label: Text("Sign up"),
+        color: Theme.of(context).primaryColorDark,
+        textColor: Colors.white,
       ),
     );
   }

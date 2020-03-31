@@ -15,7 +15,9 @@ class App extends StatelessWidget {
         theme: ThemeData(
           appBarTheme: AppBarTheme(color: Colors.brown[400]),
           scaffoldBackgroundColor: Colors.brown[100],
+          primaryColorDark: Colors.brown[400],
         ),
+        debugShowCheckedModeBanner: false,
         title: 'Brew crew App',
         home: new RootScreen(),
       ),
